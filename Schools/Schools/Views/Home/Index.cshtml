@@ -1,0 +1,75 @@
+﻿<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="http://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.js"
+            integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<div class="row" style="margin: 50px 0">
+    <div class="col-md-8" id ="map"></div>
+    <div class="col-md-4 values">
+        <button class="btn-primary btn recognise">Распознать</button>
+        @foreach (var item in ViewBag.Addresses)
+        {
+            <p class="address">@item</p>
+        }
+
+    </div>
+</div>
+</body>
+
+<script>
+    var myMap;
+    ymaps.ready(init);
+    var obj = [];
+
+
+    function init() {
+        myMap = new ymaps.Map('map', {
+            center: [56.29, 84.57],
+            zoom: 10
+        }, {
+            searchControlProvider: 'yandex#search'
+        });
+
+        var myGeocoder; 
+
+
+        $('.recognise').on('click', function () {
+            var name;
+            $('.values').find('.address').each(function (item, i) {
+                myGeocoder = ymaps.geocode($(this).text());
+                name = $(this).text();
+ 
+                myGeocoder.then(
+                    function (res) {
+                        myMap.geoObjects.add(res.geoObjects);
+                        //console.log(res.geoObjects.get(0).geometry.getCoordinates());
+                        obj.push({
+                            name: name,
+                            coord:res.geoObjects.get(0).geometry.getCoordinates(),
+                        });
+                    },
+                    function (err) {
+                        console.log('error');
+                    }
+                );
+            });
+
+            
+        });
+
+      
+    }
+
+
+
+</script>
+<style>
+     #map {
+    height: 500px;
+     margin: 0 0 10% 0;
+    }
+</style>
