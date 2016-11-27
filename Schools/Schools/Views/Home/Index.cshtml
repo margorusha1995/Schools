@@ -9,18 +9,25 @@
 <body>
 <div class="row" style="margin: 50px 0">
     <div class="col-md-8" id ="map"></div>
-    <div class="col-md-4 values">
-        @*<button class="btn-primary btn recognise">Распознать</button>
-        @foreach (var item in ViewBag.Addresses)
-        {
-            <p class="address">@item</p>
-        }*@
-
+    <div class="col-md-4">
+        <div class="row">
+            <button class="btn-primary btn recognise">Распознать</button>
+            <button class="btn-success btn save">Сохранить</button>
+            <button class="btn-default btn route">Построить маршрут</button>
+        </div>
+        
+        <div class="row values well">
+            @foreach (var item in ViewBag.Addresses)
+            {
+                <p class="address-@item.id">@item.address</p>
+            }
+        </div>
     </div>
 </div>
 </body>
 
 <script>
+    var data = @Json.Serialize(ViewBag.Addresses);
     var myMap;
     ymaps.ready(init);
     var obj = [];
@@ -34,42 +41,97 @@
             searchControlProvider: 'yandex#search'
         });
 
-        var myGeocoder; 
+        var myGeocoder;
 
 
         $('.recognise').on('click', function () {
-            var name;
-            $('.values').find('.address').each(function (item, i) {
-                myGeocoder = ymaps.geocode($(this).text());
-                name = $(this).text();
- 
+            var myGeoObject;
+
+            data.forEach(function(item, i) {
+                item.func = function(res) {
+                    item.coorsinates = res.geoObjects.get(0).geometry.getCoordinates();
+
+                      myGeoObject = new ymaps.GeoObject({
+                          geometry: {
+                              type: "Point",
+                              coordinates: res.geoObjects.get(0).geometry.getCoordinates()
+                          },
+                          properties: {
+                              iconContent: '',
+                              balloonContent: 'Эта метка была поставлена тут для адреса: <strong>' +  res.metaData.geocoder.request +
+                                  '</strong>. Если местоположение некорректно, передвиньте метку. По данному адресу должна находиться: <strong>' + item.name + '</strog>',
+                          }
+                      },
+                    {
+                        preset: 'twirl#darkgreenIcon',
+                        draggable: true
+                    });
+
+                      myMap.geoObjects.add(myGeoObject);
+
+                    $('.address-' + item.id).css('color', 'green');
+
+                      myGeoObject.events.add('drag', function (e) {
+                          console.log(e.get('target').geometry.getCoordinates());
+                          item.coorsinates = e.get('target').geometry.getCoordinates();
+
+                      });
+                };
+
+                myGeocoder = ymaps.geocode(item.address);
+                id = item.id;
+
                 myGeocoder.then(
-                    function (res) {
-                        myMap.geoObjects.add(res.geoObjects);
-                        //console.log(res.geoObjects.get(0).geometry.getCoordinates());
-                        obj.push({
-                            name: name,
-                            coord:res.geoObjects.get(0).geometry.getCoordinates(),
-                        });
-                    },
+                    item.func,
                     function (err) {
                         console.log('error');
+                        ('.address-' + item.id).css('color', 'red');
                     }
                 );
             });
+        });
+        $('.save').on('click', function() {
+            let t = JSON.stringify(data);
 
-            
+            $.ajax({
+                type: "POST",
+                url: "/Home/Save",
+                data: 'name=' + t,
+                success: function(msg){
+                    alert( "Data Saved: " + msg );
+                }
+            });
         });
 
-      
-    }
+        $('.route').on('click', function() {
+            data.forEach(function(item, i) {
+                var multiRoute = new ymaps.multiRouter.MultiRoute({
+                    referencePoints: [
+                        item.coorsinates,
+                        data[0].coorsinates,
+                    ],
+                    params: {
+                        results: 1
+                    }
+                });
 
+                myMap.geoObjects.add(multiRoute);
+            });
+        });
+    }
 
 
 </script>
 <style>
      #map {
-    height: 500px;
+    height: 550px;
      margin: 0 0 10% 0;
     }
+     .values {
+         max-height: 500px;
+         overflow: scroll;
+     }
+     .row {
+         margin: 0 0 20px 0;
+     }
 </style>
