@@ -36,7 +36,7 @@ namespace Schools.Controllers
             List<Structure> data = new List<Structure>();
 
             string connectionString =
-                "data source=COMPUTER-ПК\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
+                "data source=ENVY\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
             Db context =new Db(connectionString);
             var result = from schoolAddress in context.rbd_SchoolAddress
                          join school in context.rbd_Schools on schoolAddress.SchoolID equals school.SchoolID
