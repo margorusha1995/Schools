@@ -8,7 +8,7 @@
 </head>
 <body>
     <ul class="pager">
-        <li class="next"><a href="/Home/Stations">Вперед &rarr;</a></li>
+        <li class="next"><a class="next-href" href="/Home/Stations">Вперед &rarr;</a></li>
     </ul>
 <div class="row" style="margin: 50px 0">
     <div class="col-md-8" id="map"></div>
@@ -120,6 +120,10 @@
 
                 myMap.geoObjects.add(multiRoute);
             });
+        });
+
+        $('.next-href').on('click', function() {
+            $('.next-href').attr('href', 'Home/Merdge');
         });
     }
 

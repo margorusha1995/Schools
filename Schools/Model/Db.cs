@@ -8,12 +8,13 @@ namespace Model
     public partial class Db : DbContext
     {
         public Db()
-            : base("data source=ENVY\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework")
+            : base("data source=COMPUTER-ой\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework")
         {
             //COMPUTER-ой\\SQLEXPRESS
             //ENVY\\SQLEXPRESS
         }
 
+        public virtual DbSet<GoogleCoordinates> GoogleCoordinates { get; set; }
         public virtual DbSet<rbd_Address> rbd_Address { get; set; }
         public virtual DbSet<rbd_Areas> rbd_Areas { get; set; }
         public virtual DbSet<rbd_Coordinates> rbd_Coordinates { get; set; }
@@ -35,6 +36,7 @@ namespace Model
         public virtual DbSet<rbdc_TimeZones> rbdc_TimeZones { get; set; }
         public virtual DbSet<rbdc_TownTypes> rbdc_TownTypes { get; set; }
         public virtual DbSet<sysdiagrams> sysdiagrams { get; set; }
+        public virtual DbSet<YandexCoordinates> YandexCoordinates { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

@@ -11,16 +11,18 @@
     <li class="next"><a href="/Home/Stations">Вперед &rarr;</a></li>
 </ul>
 <div class="row">
-    <div class="col-md-6" id="map">
+    <div class="col-md-4" id="map">
         
     </div>
-    <div class="col-md-3">
-        <h4>Yandex</h4>
+    <div class="col-md-8">
+        <h4>Google</h4>
         <table class="table">
             <thead>
                 <tr>
-                    <th>Наименование</th>
-                    <th>Коордтнаты</th>
+                    <th>Название</th>
+                    <th>Адрес</th>
+                    <th>Коордтнаты Яндекс</th>
+                    <th>Коордтнаты Google</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,8 +33,8 @@
             </tbody>
         </table>
     </div>
-    <div class="col-md-3">
-        <h4>Google</h4>
+    <div class="col-md-4">
+        <h4>Yandex </h4>
         <table class="table">
             <thead>
             <tr>
@@ -41,10 +43,13 @@
             </tr>
             </thead>
             <tbody>
-            <tr>
-                <td>Юлия</td>
-                <td>Петренко</td>
-            </tr>
+            @foreach (var item in ViewBag.Schools)
+            {
+                <tr>
+                    <td>@item.name</td>
+                    <td>@item.coordinates[0]  @item.coordinates[1]</td>
+                </tr>
+            }
             </tbody>
         </table>
     </div>
