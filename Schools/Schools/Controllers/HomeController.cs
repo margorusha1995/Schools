@@ -34,9 +34,10 @@ namespace Schools.Controllers
         public IActionResult Index()
         {
             List<Structure> data = new List<Structure>();
-
+            //COMPUTER-ПК\SQLEXPRESS
+            //ENVY\\SQLEXPRESS
             string connectionString =
-                "data source=ENVY\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
+                "data source=COMPUTER-ПК\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
             Db context =new Db(connectionString);
             var result = from schoolAddress in context.rbd_SchoolAddress
                          join school in context.rbd_Schools on schoolAddress.SchoolID equals school.SchoolID
@@ -80,10 +81,45 @@ namespace Schools.Controllers
         }
 
 
-        public IActionResult Save(Structure[] name)
+        public IActionResult Save()
         {
            
             return View();
+        }
+
+        public IActionResult Stations()
+        {
+            List<Structure> data = new List<Structure>();
+
+            string connectionString =
+                "data source=COMPUTER-ПК\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
+            Db context = new Db(connectionString);
+            var result = from stations in context.rbd_Stations
+                         select new
+                         {
+                             ID = stations.StationID,
+                             Name = stations.StationName,
+                             Addess = stations.StationAddress,
+
+                         };
+            int i = 0;
+            foreach (var item in result)
+            {
+                i++;
+                data.Add(new Structure(
+                    item.Addess,
+                    item.ID.ToString(),
+                    item.Name));
+
+                if (i > 10)
+                {
+                    break;
+                }
+            }
+
+            ViewBag.Addresses = data;
+
+            return View("Index");
         }
     }
 }

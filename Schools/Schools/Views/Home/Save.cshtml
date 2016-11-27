@@ -1,17 +1,52 @@
-﻿@{
-    ViewData["Title"] = "Contact";
-}
-<h2>@ViewData["Title"].</h2>
-<h3>@ViewData["Message"]</h3>
-
-<address>
-    One Microsoft Way<br />
-    Redmond, WA 98052-6399<br />
-    <abbr title="Phone">P:</abbr>
-    425.555.0100
-</address>
-
-<address>
-    <strong>Support:</strong> <a href="mailto:Support@example.com">Support@example.com</a><br />
-    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
-</address>
+﻿<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="http://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
+    <script src="https://code.jquery.com/jquery-2.2.4.js"
+            integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="
+            crossorigin="anonymous"></script>
+</head>
+<body>
+<ul class="pager">
+    <li class="next"><a href="/Home/Stations">Вперед &rarr;</a></li>
+</ul>
+<div class="row">
+    <div class="col-md-6" id="map">
+        
+    </div>
+    <div class="col-md-3">
+        <h4>Yandex</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Наименование</th>
+                    <th>Коордтнаты</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>634062, Томская обл., г. Томск, ул. Павла Нарановича, д. 10</td>
+                    <td>[10,10]</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-3">
+        <h4>Google</h4>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Наименование</th>
+                <th>Коордтнаты</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Юлия</td>
+                <td>Петренко</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
