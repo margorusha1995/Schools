@@ -2,34 +2,100 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible">
 </head>
-<body
+<body>
+    <ul class="pager">
+        <li class="next"><a href="/Home/Stations">Вперед &rarr;</a></li>
+    </ul>
     <div class="row" style="margin: 50px 0">
-        <div class="col-md-8" id="map" style="height: 400px;"></div>
-        <div class="col-md-4 values">
+        <div class="col-md-8" id="map"></div>
+        <div class="col-md-4">
+            <div class="row">
+                <button class="btn-primary btn recognise">Распознать</button>
+                <button class="btn-success btn save">Сохранить</button>
+            </div>
 
+            <div class="row values well">
+                @foreach (var item in ViewBag.Addresses)
+                {
+                    <p class="address-@item.id">@item.address</p>
+                }
+            </div>
         </div>
     </div>
-</body>
+</body>      
 
 <script>
-      function initMap() {
-        // Create a map object and specify the DOM element for display.
-        var map = new google.maps.Map(document.getElementById('map'), {
-          center: {lat: -34.397, lng: 150.644},
-          scrollwheel: true,
-          zoom: 8
-        });
-        marker = new google.maps.Marker({
-            map: map,
-            draggable: true
-        });
+    let data = @Json.Serialize(ViewBag.Addresses);
+    let marks = [];
+    let map;
+    for (let i = 0; i < data.length; ++i) {
+        data[i]['fill'] = function (results, status) {
+            if (results.length == 0)
+                return;
+            data[i].coordinates = [results[0].geometry.location.lat(), results[0].geometry.location.lng()];
+            let it = document.getElementsByClassName('address-' + data[i].id);
+            it[0].style.color = "green";
 
+            marks[i] = new google.maps.Marker({
+                position: {'lat': data[i].coordinates[0], 'lng': data[i].coordinates[1]},
+                map: map,
+                title: data[i].name
+            });
+        }
+    };
+
+    document.getElementsByClassName('save')[0].addEventListener('click',  function () {
+        let t = JSON.stringify(data);
+
+        $.ajax({
+            type: "POST",
+            url: "/Home/Save",
+            data: t,
+            contentType: "application/json;charset=utf-8",
+            success: function(msg){
+                alert( "Data Saved: " + msg );
+            }
+        });
+    });
+
+    document.getElementsByClassName('recognise')[0].addEventListener('click', recognise);
+
+   
+    
+    function recognise(){
         var geocoder = new google.maps.Geocoder();
-        geocoder.geocode({ 'address': "Томск ул.Вершинина 39а" }, function (results, status) {
-            marker.setPosition(results[0].geometry.location);
-            map.setCenter(results[0].geometry.location);
-        })
-      }
+        
+        for (let i = 0; i < data.length; ++i) {
+            geocoder.geocode({ 'address': data[i].address }, data[i].fill);
+        };
+    }
+   
+
+    function initMap() {
+        // Create a map object and specify the DOM element for display.
+        map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 84, lng: 56},
+            scrollwheel: true,
+            zoom: 8,
+            
+        });
+    }
 
 </script>
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLCyVbJQNAWS6PP-fTvaHUEOM9TXwu4gQ&callback=initMap" async defer></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBLCyVbJQNAWS6PP-fTvaHUEOM9TXwu4gQ&callback=initMap" async defer></script> 
+
+<style>
+    #map {
+        height: 500px;
+        margin: 0 0 10% 0;
+    }
+
+    .values {
+        max-height: 450px;
+        overflow: scroll;
+    }
+
+    .row {
+        margin: 0 0 20px 0;
+    }
+</style>

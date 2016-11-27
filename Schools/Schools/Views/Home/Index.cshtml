@@ -36,7 +36,7 @@
 
     function init() {
         myMap = new ymaps.Map('map', {
-            center: [56.29, 84.57],
+            center: [57.000873899999988, 80.570321700000022],
             zoom: 10
         }, {
             searchControlProvider: 'yandex#search'
@@ -86,7 +86,7 @@
                     item.func,
                     function (err) {
                         console.log('error');
-                        ('.address-' + item.id).css('color', 'red');
+                        $('.address-' + item.id).css('color', 'red');
                     }
                 );
             });
