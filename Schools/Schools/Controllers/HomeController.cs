@@ -56,7 +56,7 @@ namespace Schools.Controllers
                 data.Add(new Structure()
                 {
                     address = item.TownshipName + ", " + item.LocalityTypeName + " " + item.LocalityName + ", " + item.StreetTypeName + " " + item.StreetName + ", " + item.BuildingNumber,
-                    id = item.ID.ToString(),
+                    id = item.ID,
                     name = item.Name
                 });
 
@@ -119,22 +119,41 @@ namespace Schools.Controllers
         }
 
 
-        public IActionResult Save([FromBody]Structure[] name)
+        public IActionResult Save(string type, [FromBody]Structure[] name)
         {
-            foreach (var item in name)
+            if (type == "Y")
             {
-                if (item.coordinates != null)
+                foreach (var item in name)
                 {
-                    context.YandexCoordinates.Add(new YandexCoordinates()
+                    if (item.coordinates != null)
                     {
-                        id = Guid.NewGuid(),
-                        longitude = item.coordinates[0],
-                        latitude = item.coordinates[1],
-                        placeID = item.id,
-                    });
+                        context.YandexCoordinates.Add(new YandexCoordinates()
+                        {
+                            id = Guid.NewGuid(),
+                            longitude = item.coordinates[0],
+                            latitude = item.coordinates[1],
+                            placeID = item.id,
+                        });
+                    }
                 }
-                
             }
+            else if (type == "G")
+            {
+                foreach (var item in name)
+                {
+                    if (item.coordinates != null)
+                    {
+                        context.GoogleCoordinates.Add(new GoogleCoordinates()
+                        {
+                            id = Guid.NewGuid(),
+                            longitude = item.coordinates[0],
+                            latitude = item.coordinates[1],
+                            placeID = item.id,
+                        });
+                    }
+                }
+            }
+        
             context.SaveChanges();
 
             return View("Save");
