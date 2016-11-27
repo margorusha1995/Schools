@@ -50,7 +50,7 @@
 
             data.forEach(function(item, i) {
                 item.func = function(res) {
-                    item.coorsinates = res.geoObjects.get(0).geometry.getCoordinates();
+                    item.coordinates = res.geoObjects.get(0).geometry.getCoordinates();
 
                       myGeoObject = new ymaps.GeoObject({
                           geometry: {
@@ -74,7 +74,7 @@
 
                       myGeoObject.events.add('drag', function (e) {
                           console.log(e.get('target').geometry.getCoordinates());
-                          item.coorsinates = e.get('target').geometry.getCoordinates();
+                          item.coordinates = e.get('target').geometry.getCoordinates();
 
                       });
                 };
@@ -110,8 +110,8 @@
             data.forEach(function(item, i) {
                 var multiRoute = new ymaps.multiRouter.MultiRoute({
                     referencePoints: [
-                        item.coorsinates,
-                        data[0].coorsinates,
+                        item.coordinates,
+                        data[0].coordinates,
                     ],
                     params: {
                         results: 1

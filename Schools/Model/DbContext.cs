@@ -10,6 +10,8 @@ namespace Model
         public Db()
             : base("data source=ENVY\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework")
         {
+            //COMPUTER-ой\\SQLEXPRESS
+            //ENVY\\SQLEXPRESS
         }
 
         public virtual DbSet<rbd_Address> rbd_Address { get; set; }
