@@ -30,8 +30,11 @@
     let map;
     for (let i = 0; i < data.length; ++i) {
         data[i]['fill'] = function (results, status) {
-            if (results.length == 0)
+            if (results.length == 0) {
+                let it = document.getElementsByClassName('address-' + data[i].id);
+                it[0].style.color = "red";
                 return;
+            }
             data[i].coordinates = [results[0].geometry.location.lat(), results[0].geometry.location.lng()];
             let it = document.getElementsByClassName('address-' + data[i].id);
             it[0].style.color = "green";
@@ -49,7 +52,7 @@
 
         $.ajax({
             type: "POST",
-            url: "/Home/Save",
+            url: "/Home/Save?type=G",
             data: t,
             contentType: "application/json;charset=utf-8",
             success: function(msg){
