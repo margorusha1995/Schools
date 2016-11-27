@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Model;
 using Newtonsoft.Json;
+using Microsoft.EntityFrameworkCore;
 
 namespace Schools.Controllers
 {
@@ -14,18 +15,16 @@ namespace Schools.Controllers
         public string id;
         public string name;
         public double[] coorsinates;
-
-        public Structure(string _addess, string _id, string _name)
-        {
-            address = _addess;
-            id = _id;
-            coorsinates = new double[2];
-            name = _name;
-        }
     }
 
     public class HomeController : Controller
     {
+        Db context;
+        public HomeController(Db db)
+        {
+            context = db;
+        }
+
         public IActionResult GoogleMaps()
         {
             return View();
@@ -35,9 +34,8 @@ namespace Schools.Controllers
         {
             List<Structure> data = new List<Structure>();
 
-            string connectionString =
-                "data source=ENVY\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
-            Db context =new Db(connectionString);
+
+
             var result = from schoolAddress in context.rbd_SchoolAddress
                          join school in context.rbd_Schools on schoolAddress.SchoolID equals school.SchoolID
                          join address in context.rbd_Address on schoolAddress.AddressID equals address.AddressID
@@ -63,10 +61,12 @@ namespace Schools.Controllers
             foreach (var item in result)
             {
                 i++;
-                data.Add(new Structure(
-                    item.TownshipName + ", " + item.LocalityTypeName + " " + item.LocalityName + ", " + item.StreetTypeName + " " + item.StreetName + ", " + item.BuildingNumber,
-                    item.ID.ToString(), 
-                    item.Name));
+                data.Add(new Structure()
+                {
+                    address = item.TownshipName + ", " + item.LocalityTypeName + " " + item.LocalityName + ", " + item.StreetTypeName + " " + item.StreetName + ", " + item.BuildingNumber,
+                    id = item.ID.ToString(),
+                    name = item.Name
+                });
 
                 if (i > 10)
                 {
@@ -80,7 +80,7 @@ namespace Schools.Controllers
         }
 
 
-        public IActionResult Save(Structure[] name)
+        public IActionResult Save([FromBody]Structure[] name)
         {
            
             return View();

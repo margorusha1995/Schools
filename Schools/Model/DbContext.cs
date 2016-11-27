@@ -7,8 +7,8 @@ namespace Model
 
     public partial class Db : DbContext
     {
-        public Db(string connectionString)
-            : base(connectionString)
+        public Db()
+            : base("data source=ENVY\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework")
         {
         }
 
