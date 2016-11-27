@@ -56,7 +56,7 @@ namespace Schools.Controllers
                 data.Add(new Structure()
                 {
                     address = item.TownshipName + ", " + item.LocalityTypeName + " " + item.LocalityName + ", " + item.StreetTypeName + " " + item.StreetName + ", " + item.BuildingNumber,
-                    id = item.ID.ToString(),
+                    id = item.ID,
                     name = item.Name
                 });
 
