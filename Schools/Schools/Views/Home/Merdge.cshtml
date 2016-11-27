@@ -15,31 +15,14 @@
         
     </div>
     <div class="col-md-8">
-        <h4>Google</h4>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Название</th>
-                    <th>Адрес</th>
-                    <th>Коордтнаты Яндекс</th>
-                    <th>Коордтнаты Google</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>634062, Томская обл., г. Томск, ул. Павла Нарановича, д. 10</td>
-                    <td>[10,10]</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-    <div class="col-md-4">
         <h4>Yandex </h4>
         <table class="table">
             <thead>
             <tr>
                 <th>Наименование</th>
-                <th>Коордтнаты</th>
+                <th>Адреса</th>
+                <th>Яндекс</th>
+                <th>Google</th>
             </tr>
             </thead>
             <tbody>
@@ -47,7 +30,9 @@
             {
                 <tr>
                     <td>@item.name</td>
+                    <td>@item.address</td>
                     <td>@item.coordinates[0]  @item.coordinates[1]</td>
+                    <td>@item.coordinates[2]  @item.coordinates[3]</td>
                 </tr>
             }
             </tbody>

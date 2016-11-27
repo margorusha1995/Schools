@@ -8,7 +8,7 @@ namespace Model
     public partial class Db : DbContext
     {
         public Db()
-            : base("data source=ENVY\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework")
+            : base("data source=COMPUTER-ой\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework")
         {
             //COMPUTER-ой\\SQLEXPRESS
             //ENVY\\SQLEXPRESS

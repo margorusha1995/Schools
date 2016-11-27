@@ -49,10 +49,9 @@ namespace Schools.Controllers
                              TownshipName = township.TownshipName,
                              BuildingTypeName = building.BuildingTypeName
                          };
-            int i = 0;
+
             foreach (var item in result)
             {
-                i++;
                 data.Add(new Structure()
                 {
                     address = item.TownshipName + ", " + item.LocalityTypeName + " " + item.LocalityName + ", " + item.StreetTypeName + " " + item.StreetName + ", " + item.BuildingNumber,
@@ -60,10 +59,6 @@ namespace Schools.Controllers
                     name = item.Name
                 });
 
-                if (i > 10)
-                {
-                    break;
-                }
             }
 
             ViewBag.Addresses = data;
@@ -96,21 +91,15 @@ namespace Schools.Controllers
                              TownshipName = township.TownshipName,
                              BuildingTypeName = building.BuildingTypeName
                          };
-            int i = 0;
+
             foreach (var item in result)
             {
-                i++;
                 data.Add(new Structure()
                 {
                     address = item.TownshipName + ", " + item.LocalityTypeName + " " + item.LocalityName + ", " + item.StreetTypeName + " " + item.StreetName + ", " + item.BuildingNumber,
                     id = item.ID,
                     name = item.Name
                 });
-
-                if (i > 10)
-                {
-                    break;
-                }
             }
 
             ViewBag.Addresses = data;
@@ -125,32 +114,48 @@ namespace Schools.Controllers
             {
                 foreach (var item in name)
                 {
+                    YandexCoordinates obj = new YandexCoordinates()
+                    {
+                        id = Guid.NewGuid(),
+                        placeID = item.id,
+                    };
+
                     if (item.coordinates != null)
                     {
-                        context.YandexCoordinates.Add(new YandexCoordinates()
-                        {
-                            id = Guid.NewGuid(),
-                            longitude = item.coordinates[0],
-                            latitude = item.coordinates[1],
-                            placeID = item.id,
-                        });
+                        obj.longitude = item.coordinates[0];
+                        obj.latitude = item.coordinates[1];
                     }
+                    else
+                    {
+                        obj.longitude = null;
+                        obj.latitude = null;
+                    }
+
+                    context.YandexCoordinates.Add(obj);
                 }
             }
             else if (type == "G")
             {
                 foreach (var item in name)
                 {
+                    GoogleCoordinates obj = new GoogleCoordinates()
+                    {
+                        id = Guid.NewGuid(),
+                        placeID = item.id,
+                    };
+
                     if (item.coordinates != null)
                     {
-                        context.GoogleCoordinates.Add(new GoogleCoordinates()
-                        {
-                            id = Guid.NewGuid(),
-                            longitude = item.coordinates[0],
-                            latitude = item.coordinates[1],
-                            placeID = item.id,
-                        });
+                        obj.longitude = item.coordinates[0];
+                        obj.latitude = item.coordinates[1];
                     }
+                    else
+                    {
+                        obj.longitude = null;
+                        obj.latitude = null;
+                    }
+
+                    context.GoogleCoordinates.Add(obj);
                 }
             }
         
@@ -171,19 +176,12 @@ namespace Schools.Controllers
                              Addess = stations.StationAddress,
 
                          };
-            int i = 0;
             foreach (var item in result)
             {
-                i++;
                 data.Add(new Structure()
                 { address=item.Addess,
                     id=item.ID,
                     name=item.Name });
-
-                if (i > 10)
-                {
-                    break;
-                }
             }
              
             ViewBag.Addresses = data;
@@ -202,14 +200,17 @@ namespace Schools.Controllers
                          join street in context.rbdc_StreetTypes on address.StreetTypeID equals street.StreetTypeID
                          join township in context.rbd_Townships on address.TownshipID equals township.TownshipID
                          join building in context.rbdc_BuildingTypes on address.BuildingTypeID equals building.BuildingTypeID
-                         join coordinates in context.YandexCoordinates on address.AddressID equals coordinates.placeID 
+                         join Ycoordinates in context.YandexCoordinates on address.AddressID equals Ycoordinates.placeID
+                         join Gcoordinates in context.GoogleCoordinates on address.AddressID equals Gcoordinates.placeID
                          where schoolAddress.AddressTypeID == 1
                          select new
                          {
-                             ID = coordinates.id,
+                             ID = Ycoordinates.id,
                              Name = school.SchoolName,
-                             Latitude = coordinates.latitude,
-                             Longitude = coordinates.longitude,
+                             YLatitude = Ycoordinates.latitude,
+                             YLongitude = Ycoordinates.longitude,
+                             GLatitude = Gcoordinates.latitude,
+                             GLongitude = Gcoordinates.longitude,
                              ZipCode = address.ZipCode,
                              LocalityName = address.LocalityName,
                              StreetName = address.StreetName,
@@ -221,25 +222,15 @@ namespace Schools.Controllers
 
                          };
 
-            int i = 0;
             foreach (var item in result)
             {
-                if (item.Latitude != null & item.Longitude != null)
+                data.Add(new Structure()
                 {
-                    i++;
-                    data.Add(new Structure()
-                    {
-                        address = item.LocalityName,
-                        id = item.ID,
-                        name = item.Name,
-                        coordinates = new double?[2] { item.Latitude, item.Longitude }
-                    });
-
-                    if (i > 10)
-                    {
-                        break;
-                    }
-                }
+                    address = item.LocalityTypeName + " " + item.LocalityName + " " + item.StreetName + ", " + item.BuildingNumber,
+                    id = item.ID,
+                    name = item.Name,
+                    coordinates = new double?[4] { item.YLatitude, item.YLongitude, item.GLatitude, item.GLongitude }
+                });
             }
 
             ViewBag.Schools = data;
