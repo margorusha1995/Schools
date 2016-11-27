@@ -85,5 +85,40 @@ namespace Schools.Controllers
            
             return View();
         }
+
+        public IActionResult Stations()
+        {
+            List<Structure> data = new List<Structure>();
+
+            string connectionString =
+                "data source=COMPUTER-ПК\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
+            Db context = new Db(connectionString);
+            var result = from stations in context.rbd_Stations
+                         select new
+                         {
+                             ID = stations.StationID,
+                             Name = stations.StationName,
+                             Addess = stations.StationAddress,
+
+                         };
+            int i = 0;
+            foreach (var item in result)
+            {
+                i++;
+                data.Add(new Structure(
+                    item.Addess,
+                    item.ID.ToString(),
+                    item.Name));
+
+                if (i > 10)
+                {
+                    break;
+                }
+            }
+
+            ViewBag.Addresses = data;
+
+            return View("Index");
+        }
     }
 }

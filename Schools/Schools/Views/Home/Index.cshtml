@@ -7,15 +7,17 @@
             crossorigin="anonymous"></script>
 </head>
 <body>
+    <ul class="pager">
+        <li class="next"><a href="/Home/Stations">Вперед &rarr;</a></li>
+    </ul>
 <div class="row" style="margin: 50px 0">
-    <div class="col-md-8" id ="map"></div>
+    <div class="col-md-8" id="map"></div>
     <div class="col-md-4">
         <div class="row">
             <button class="btn-primary btn recognise">Распознать</button>
             <button class="btn-success btn save">Сохранить</button>
-            <button class="btn-default btn route">Построить маршрут</button>
         </div>
-        
+
         <div class="row values well">
             @foreach (var item in ViewBag.Addresses)
             {
@@ -31,7 +33,6 @@
     var myMap;
     ymaps.ready(init);
     var obj = [];
-
 
     function init() {
         myMap = new ymaps.Map('map', {
@@ -126,11 +127,11 @@
 </script>
 <style>
      #map {
-    height: 550px;
+    height: 500px;
      margin: 0 0 10% 0;
     }
      .values {
-         max-height: 500px;
+         max-height: 450px;
          overflow: scroll;
      }
      .row {
