@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{1A1E81D4-C072-45D4-8BBA-8B5E480E5BD5}</ProjectGuid>
+    <ProjectGuid>{31C42E89-380C-4674-ACF0-A0BAD8CBA57A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Model</RootNamespace>
@@ -51,7 +51,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbContext.cs" />
+    <Compile Include="Db.cs" />
+    <Compile Include="GoogleCoordinates.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="rbdc_AddressTypes.cs" />
     <Compile Include="rbdc_BuildingTypes.cs" />
@@ -74,6 +75,7 @@
     <Compile Include="rbd_Stations.cs" />
     <Compile Include="rbd_Townships.cs" />
     <Compile Include="sysdiagrams.cs" />
+    <Compile Include="YandexCoordinates.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
