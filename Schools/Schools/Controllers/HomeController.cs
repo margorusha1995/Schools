@@ -4,14 +4,31 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Model;
+using Newtonsoft.Json;
 
 namespace Schools.Controllers
 {
+    public class Structure
+    {
+        public string address;
+        public string id;
+        public string name;
+        public double[] coorsinates;
+
+        public Structure(string _addess, string _id, string _name)
+        {
+            address = _addess;
+            id = _id;
+            coorsinates = new double[2];
+            name = _name;
+        }
+    }
+
     public class HomeController : Controller
     {
         public IActionResult Index()
         {
-            List<string> addresses = new List<string>();
+            List<Structure> data = new List<Structure>();
 
             string connectionString =
                 "data source=COMPUTER-ПК\\SQLEXPRESS;initial catalog=School;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework";
@@ -37,20 +54,30 @@ namespace Schools.Controllers
                              TownshipName = township.TownshipName,
                              BuildingTypeName = building.BuildingTypeName
                          };
-
             int i = 0;
             foreach (var item in result)
             {
                 i++;
-                addresses.Add(item.TownshipName + ", " + item.LocalityTypeName + " " + item.LocalityName + ", " + item.StreetTypeName + " " + item.StreetName + ", " + item.BuildingNumber);
-                if (i > 15)
+                data.Add(new Structure(
+                    item.TownshipName + ", " + item.LocalityTypeName + " " + item.LocalityName + ", " + item.StreetTypeName + " " + item.StreetName + ", " + item.BuildingNumber,
+                    item.ID.ToString(), 
+                    item.Name));
+
+                if (i > 10)
                 {
                     break;
                 }
             }
 
-            ViewBag.Addresses = addresses;
+            ViewBag.Addresses = data;
 
+            return View();
+        }
+
+
+        public IActionResult Save(Structure[] name)
+        {
+           
             return View();
         }
     }
