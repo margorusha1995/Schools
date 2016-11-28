@@ -61,17 +61,30 @@
         });
     });
 
-    document.getElementsByClassName('recognise')[0].addEventListener('click', recognise);
+    document.getElementsByClassName('recognise')[0].addEventListener('click', recogniseTimer);
 
-   
+    let counter = 0;
+    let timerId
+    function recogniseTimer(){
+        timerId = setInterval(timer, 500);
+    }
+
+    function timer(){
+        if (counter > data.length)
+            clearInterval(timerId);
+        recognise();
+
+    }
     
     function recognise(){
         var geocoder = new google.maps.Geocoder();
-        
-        for (let i = 0; i < data.length; ++i) {
-            geocoder.geocode({ 'address': data[i].address }, data[i].fill);
+        let temp = counter + 10;
+        for (; counter < data.length && counter <= temp; ++counter) {
+            geocoder.geocode({ 'address': data[counter].address }, data[counter].fill);
         };
     }
+
+
    
 
     function initMap() {
