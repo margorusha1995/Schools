@@ -15,6 +15,7 @@ namespace Schools.Controllers
         public Guid id;
         public string name;
         public double?[] coordinates;
+        public bool same;
     }
 
     public class HomeController : Controller
@@ -203,14 +204,15 @@ namespace Schools.Controllers
                          join Ycoordinates in context.YandexCoordinates on address.AddressID equals Ycoordinates.placeID
                          join Gcoordinates in context.GoogleCoordinates on address.AddressID equals Gcoordinates.placeID
                          where schoolAddress.AddressTypeID == 1
+                         orderby Gcoordinates.latitude
                          select new
                          {
                              ID = Ycoordinates.id,
                              Name = school.SchoolName,
-                             YLatitude = Ycoordinates.latitude,
-                             YLongitude = Ycoordinates.longitude,
-                             GLatitude = Gcoordinates.latitude,
-                             GLongitude = Gcoordinates.longitude,
+                             YLatitude = Ycoordinates.latitude == null ? Ycoordinates.latitude : Math.Round((double)Ycoordinates.latitude, 2),
+                             YLongitude = Ycoordinates.longitude == null ? Ycoordinates.longitude : Math.Round((double)Ycoordinates.longitude, 2),
+                             GLatitude = Gcoordinates.latitude == null ? Gcoordinates.latitude : Math.Round((double)Gcoordinates.latitude, 2),
+                             GLongitude = Gcoordinates.longitude == null ? Gcoordinates.longitude : Math.Round((double)Gcoordinates.longitude, 2),
                              ZipCode = address.ZipCode,
                              LocalityName = address.LocalityName,
                              StreetName = address.StreetName,
@@ -221,15 +223,26 @@ namespace Schools.Controllers
                              BuildingTypeName = building.BuildingTypeName
 
                          };
-
             foreach (var item in result)
             {
+
                 data.Add(new Structure()
                 {
-                    address = item.LocalityTypeName + " " + item.LocalityName + " " + item.StreetName + ", " + item.BuildingNumber,
+                    address =
+                        item.LocalityTypeName + " " + item.LocalityName + " " + item.StreetName + ", " +
+                        item.BuildingNumber,
                     id = item.ID,
                     name = item.Name,
-                    coordinates = new double?[4] { item.YLatitude, item.YLongitude, item.GLatitude, item.GLongitude }
+                    coordinates = new double?[4]
+                    {
+                        item.YLatitude,
+                        item.YLongitude,
+                        item.GLatitude,
+                        item.GLongitude
+                    },
+                    same = item.YLatitude == item.GLatitude && item.GLongitude == item.YLongitude ? true : false,
+
+
                 });
             }
 

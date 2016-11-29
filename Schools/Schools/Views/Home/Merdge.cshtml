@@ -1,42 +1,119 @@
-﻿<head>
+﻿<html ng-app="myApp">
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
     <script src="http://api-maps.yandex.ru/2.1/?lang=ru_RU" type="text/javascript"></script>
     <script src="https://code.jquery.com/jquery-2.2.4.js"
             integrity="sha256-iT6Q9iMJYuQiMWNd9lDyBUStIq/8PuOW33aOqmvFpqI="
             crossorigin="anonymous"></script>
+
 </head>
 <body>
-<ul class="pager">
-    <li class="next"><a href="/Home/Stations">Вперед &rarr;</a></li>
-</ul>
-<div class="row">
-    <div class="col-md-4" id="map">
-        
-    </div>
-    <div class="col-md-8">
-        <h4>Yandex </h4>
-        <table class="table">
-            <thead>
-            <tr>
-                <th>Наименование</th>
-                <th>Адреса</th>
-                <th>Яндекс</th>
-                <th>Google</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var item in ViewBag.Schools)
+    <ul class="pager">
+        <li class="next"><a href="/Home/Stations">Вперед &rarr;</a></li>
+    </ul>
+    <div class="row">
+        <div class="col-md-4" id="map">
+
+        </div>
+        <div class="col-md-8" ng-controller="MerdgeController">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Наименование</th>
+                        <th>Адреса</th>
+                        <th>Яндекс</th>
+                        <th>Google</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td><span ng-click="AcceptYandex()" class="glyphicon glyphicon-ok"></span></td>
+                        <td><span ng-click="AcceptGoogle()" class="glyphicon glyphicon-ok"></span></td>
+                    </tr>
+                    @foreach (var item in ViewBag.Schools)
             {
-                <tr>
-                    <td>@item.name</td>
-                    <td>@item.address</td>
-                    <td>@item.coordinates[0]  @item.coordinates[1]</td>
-                    <td>@item.coordinates[2]  @item.coordinates[3]</td>
-                </tr>
-            }
-            </tbody>
-        </table>
+                        <tr class="data-@item.id data">
+                            <td>@item.name</td>
+                            <td>@item.address</td>
+                            <td ng-click='search("@item.coordinates[0]", "@item.coordinates[1]", "@item.id")' class="Y-@item.id Y-data data"> @item.coordinates[0] @item.coordinates[1]</td>
+                            <td class="G-@item.id G-data data">@item.coordinates[2] @item.coordinates[3]</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+        </div>
     </div>
-</div>
 </body>
+</html>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.11/angular.min.js"></script>
+<script>
+    var myApp = angular.module('myApp', []);
+
+    myApp.controller('MerdgeController', function($scope) {
+        var myMap;
+        ymaps.ready(init);
+
+        function init() {
+            myMap = new ymaps.Map('map', {
+                center: [57.000873899999988, 80.570321700000022],
+                zoom: 10
+            }, {
+                searchControlProvider: 'yandex#search'
+            });
+          }
+
+        $scope.AcceptYandex = function() {
+            $('.data').removeClass('success');
+            $('.Y-data').addClass('success');
+        };
+
+        $scope.AcceptGoogle = function() {
+            $('.data').removeClass('success');
+            $('.G-data').addClass('success');
+        };
+
+        $scope.search = function(latitude, longitude, id) {
+            myMap.geoObjects.removeAll();
+            $('.data').removeClass('success');
+            $('.Y-' + id).addClass('success');
+            ymaps.geocode([Number(longitude.replace(',', '.')), Number(latitude.replace(',', '.'))], {
+                results: 1
+            }).then(function (res) {
+                res.geoObjects.options.set('preset', 'twirl#yellowIcon');
+                myMap.geoObjects.add(res.geoObjects);
+                myMap.setBounds(res.geoObjects.getBounds());
+            });
+        };
+    });
+    var data = @Json.Serialize(ViewBag.Schools);
+    data.forEach(function(item, i) {
+        if (item.same == true) {
+            $('.data-' + item.id).addClass('success');
+        }
+    });
+
+
+</script>
+
+
+<style>
+    .glyphicon {
+        color: #1CB55C;
+    }
+    .glyphicon:hover {
+        cursor: pointer;
+        color: #20C565; 
+    }
+    #map {
+        height: 300px;
+    }
+    .Y-data:hover, .G-data:hover {
+        cursor: pointer;
+    }
+</style>
