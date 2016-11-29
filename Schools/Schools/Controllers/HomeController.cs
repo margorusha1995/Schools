@@ -194,7 +194,9 @@ namespace Schools.Controllers
         {
             List<Structure> data = new List<Structure>();
 
-            var result = from schoolAddress in context.rbd_SchoolAddress
+
+
+                var result = from schoolAddress in context.rbd_SchoolAddress
                          join school in context.rbd_Schools on schoolAddress.SchoolID equals school.SchoolID
                          join address in context.rbd_Address on schoolAddress.AddressID equals address.AddressID
                          join locality in context.rbdc_LocalityTypes on address.LocalityTypeID equals locality.LocalityTypeID
