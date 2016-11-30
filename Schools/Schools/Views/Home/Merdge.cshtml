@@ -9,45 +9,49 @@
             crossorigin="anonymous"></script>
 
 </head>
-<body>
-    <ul class="pager">
-        <li class="next"><a href="/Home/Stations">Вперед &rarr;</a></li>
-    </ul>
+<body ng-controller="MerdgeController">
+     
+<div class="row" >
+    <div class="col-md-4" id="map">
+
+    </div>
+    <div class="col-md-8 item-list">
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Наименование</th>
+                <th>Адреса</th>
+                <th>Яндекс</th>
+                <th>Google</th>
+                <th>Результат</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td></td>
+                <td></td>
+                <td><span ng-click="AcceptYandex()" class="glyphicon glyphicon-ok"></span></td>
+                <td><span ng-click="AcceptGoogle()" class="glyphicon glyphicon-ok"></span></td>
+            </tr>
+            <tr ng-repeat="item in data" class="data-{{item.id}} data">
+                <td>{{item.name}}</td>
+                <td>{{item.address}}</td>
+                <td ng-click='search(item.coordinates[0], item.coordinates[1], item.id, "Y")' ng-dblClick="YdoubleClick(item)"
+                    class="Y-{{item.id}} Y-data data"> {{item.coordinates[1]}} {{item.coordinates[0]}}</td>
+                <td ng-click='search(item.coordinates[2], item.coordinates[3], item.id, "G")' ng-dblClick="GdoubleClick(item)" class="G-{{item.id}} G-data data">{{item.coordinates[3]}} {{item.coordinates[2]}}</td>
+                <td class="R-{{item.id}}">
+                    <p style="margin: 0" ng-bind="result[item.id][1]"></p>
+                    <p style="margin: 0" ng-bind="result[item.id][0]"></p>
+                </td>
+            </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+</div>
     <div class="row">
-        <div class="col-md-3" id="map">
-
-        </div>
-        <div class="col-md-9 item-list" ng-controller="MerdgeController">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <th>Наименование</th>
-                        <th>Адреса</th>
-                        <th>Яндекс</th>
-                        <th>Google</th>
-                        <th>Результат</th>
-                    </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td></td>
-                    <td></td>
-                    <td><span ng-click="AcceptYandex()" class="glyphicon glyphicon-ok"></span></td>
-                    <td><span ng-click="AcceptGoogle()" class="glyphicon glyphicon-ok"></span></td>
-                </tr>
-                    <tr ng-repeat="item in data" class="data-{{item.id}} data">
-                        <td>{{item.name}}</td>
-                        <td>{{item.address}}</td>
-                        <td ng-click='search(item.coordinates[0], item.coordinates[1], item.id)' ng-dblClick="YdoubleClick(item)" 
-                            class="Y-{{item.id}} Y-data data"> {{item.coordinates[0]}} {{item.coordinates[1]}}</td>
-                        <td ng-dblClick="GdoubleClick(item)" class="G-{{item.id}} G-data data">{{item.coordinates[2]}} {{item.coordinates[3]}}</td>
-                        <td ng-bind="result[item.id]"></td>
-                    </tr>
-       
-                </tbody>
-            </table>
-
-        </div>
+        <button class="save btn btn-success" ng-click="save()">Сохранить</button>
     </div>
 </body>
 </html>
@@ -73,14 +77,20 @@
         $scope.AcceptYandex = function() {
             $('.data').removeClass('success');
             $('.Y-data').addClass('success');
+            data.forEach(function(item, i) {
+                $scope.result[item.id] = [item.coordinates[0], item.coordinates[1]];
+            });
         };
 
         $scope.AcceptGoogle = function() {
             $('.data').removeClass('success');
             $('.G-data').addClass('success');
+            data.forEach(function(item, i) {
+                $scope.result[item.id] = [item.coordinates[2], item.coordinates[3]];
+            });
         };
 
-        $scope.result = [];
+        $scope.result = {};
 
         $scope.YdoubleClick = function(item) {
             $scope.result[item.id] = [item.coordinates[0], item.coordinates[1]];
@@ -88,12 +98,43 @@
 
         $scope.GdoubleClick = function(item) {
             $scope.result[item.id] = [item.coordinates[2], item.coordinates[3]];
-        }
+        };
 
-        $scope.search = function(latitude, longitude, id) {
+        $scope.save = function() {
+            $('.data').removeClass('success');
+            var result = true;
+            for (let i = 0; i < data.length; ++i) {
+                if ($scope.result[data[i].id] == undefined || $scope.result[data[i].id][0] == null || $scope.result[data[i].id][1] == null) {
+                    result = false;
+                    $('.R-' + data[i].id).removeClass('success');
+                    $('.R-' + data[i].id).addClass('danger');
+
+                } else {
+                    $('.R-' + data[i].id).addClass('success');
+                    $('.R-' + data[i].id).removeClass('danger');
+                }
+            }
+            if (!result) {
+                alert('Указаны не все координаты!');
+            } else {
+                let t = JSON.stringify($scope.result);
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Home/MerdgeResult",
+                    data: t,
+                    contentType: "application/json;charset=utf-8",
+                    success: function(msg){
+                        alert("Данные сохранены");
+                    }
+                });
+            }
+        };
+
+        $scope.search = function(latitude, longitude, id, type) {
             myMap.geoObjects.removeAll();
             $('.data').removeClass('success');
-            $('.Y-' + id).addClass('success');
+            $('.' + type + '-' + id).addClass('success');
             ymaps.geocode([longitude, latitude], {
                 results: 1
             }).then(function (res) {
@@ -119,11 +160,16 @@
                 myGeoObject.events.add('drag', function (e) {
                     $scope.data.forEach(function(item, i) {
                         if (item.id == id) {
-                            item.coordinates[0] = e.get('target').geometry.getCoordinates()[1];
-                            item.coordinates[1] = e.get('target').geometry.getCoordinates()[0];
+                            item.coordinates[0] = e.get('target').geometry.getCoordinates()[1].toFixed(3);
+                            item.coordinates[1] = e.get('target').geometry.getCoordinates()[0].toFixed(3);
                         }
                     });
                 });
+
+                if (myMap.geoObjects.count > 1) {
+                    myMap.geoObjects.removeAll();
+                    myMap.geoObjects.add(myGeoObject);
+                }
 
             });
         };
@@ -154,7 +200,7 @@
         color: #20C565; 
     }
     #map {
-        height: 300px;
+        height: 400px;
     }
     .Y-data:hover, .G-data:hover {
         cursor: pointer;
@@ -162,5 +208,12 @@
     .item-list {
         height: 500px;
         overflow: scroll;
+    }
+    .save {
+        float: right;
+        margin: 10px 0;
+    }
+    .row {
+        margin: 20px 0;
     }
 </style>

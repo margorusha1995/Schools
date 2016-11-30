@@ -194,8 +194,6 @@ namespace Schools.Controllers
         {
             List<Structure> data = new List<Structure>();
 
-
-
                 var result = from schoolAddress in context.rbd_SchoolAddress
                          join school in context.rbd_Schools on schoolAddress.SchoolID equals school.SchoolID
                          join address in context.rbd_Address on schoolAddress.AddressID equals address.AddressID
@@ -209,7 +207,7 @@ namespace Schools.Controllers
                          orderby Gcoordinates.latitude
                          select new
                          {
-                             ID = Ycoordinates.id,
+                             ID = address.AddressID,
                              Name = school.SchoolName,
                              YLatitude = Ycoordinates.latitude == null ? Ycoordinates.latitude : Math.Round((double)Ycoordinates.latitude, 2),
                              YLongitude = Ycoordinates.longitude == null ? Ycoordinates.longitude : Math.Round((double)Ycoordinates.longitude, 2),
@@ -233,23 +231,47 @@ namespace Schools.Controllers
                     address =
                         item.LocalityTypeName + " " + item.LocalityName + " " + item.StreetName + ", " +
                         item.BuildingNumber,
-                    id = item.ID,
-                    name = item.Name,
-                    coordinates = new double?[4]
-                    {
-                        item.YLatitude,
-                        item.YLongitude,
-                        item.GLatitude,
-                        item.GLongitude
-                    },
-                    same = item.YLatitude == item.GLatitude && item.GLongitude == item.YLongitude ? true : false,
-
-
+                        id = item.ID,
+                        name = item.Name,
+                        coordinates = new double?[4]
+                        {
+                            item.YLatitude,
+                            item.YLongitude,
+                            item.GLatitude,
+                            item.GLongitude
+                        },
+                        same = item.YLatitude == item.GLatitude && item.GLongitude == item.YLongitude ? true : false,
                 });
             }
 
             ViewBag.Schools = data;
             return View();
+        }
+
+        public ActionResult MerdgeResult([FromBody]Dictionary<string, double[]> data)
+        {
+            foreach (var item in data)
+            {
+                Guid id = Guid.NewGuid();
+
+                context.rbd_Coordinates.Add(new rbd_Coordinates()
+                {
+                    id = id,
+                    longitude = item.Value[0],
+                    latitude = item.Value[1]
+                });
+
+                foreach (var address in context.rbd_Address)
+                {
+                    if (address.AddressID.ToString() == item.Key)
+                    {
+                        address.CoordinatesID = id;
+                    }
+                }
+            }
+            context.SaveChanges();
+
+            return View("Merdge");
         }
     }
 }

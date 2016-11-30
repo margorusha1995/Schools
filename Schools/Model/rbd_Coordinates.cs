@@ -16,9 +16,9 @@ namespace Model
 
         public Guid id { get; set; }
 
-        public double longitude { get; set; }
+        public double? longitude { get; set; }
 
-        public double latitude { get; set; }
+        public double? latitude { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<rbd_Address> rbd_Address { get; set; }
